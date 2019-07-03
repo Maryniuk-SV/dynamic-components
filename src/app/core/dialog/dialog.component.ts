@@ -1,3 +1,4 @@
+import { Subject, Observable } from 'rxjs';
 import {
   Component,
   Type,
@@ -18,13 +19,18 @@ import { InsertionDirective } from './insertion.directive';
 export class DialogComponent implements AfterViewInit, OnDestroy {
   @ViewChild(InsertionDirective) insertionPoint: InsertionDirective;
 
-  childComponentType: Type<any>;
-  componentRef: ComponentRef<any>;
+  private close: Subject<boolean> = new Subject();
+  private componentRef: ComponentRef<any>;
+  public childComponentType: Type<any>;
 
   constructor(
     private cfResolver: ComponentFactoryResolver,
     private cdRef: ChangeDetectorRef,
   ) {}
+
+  get onClose(): Observable<boolean> {
+    return this.close.asObservable();
+  }
 
   ngAfterViewInit() {
     this.loadChildComponent(this.childComponentType);
@@ -38,13 +44,13 @@ export class DialogComponent implements AfterViewInit, OnDestroy {
   }
 
   onOverlayClicked(evt: MouseEvent) {
+    this.close.next();
     console.log('onOverlayClicked: ', evt);
-    // close the dialog
   }
 
   onDialogClicked(evt: MouseEvent) {
-    console.log('onDialogClicked: ', evt);
     evt.stopPropagation();
+    console.log('onDialogClicked: ', evt);
   }
 
   loadChildComponent(componentType: Type<any>) {

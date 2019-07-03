@@ -11,6 +11,14 @@ export class AppComponent {
   constructor(private dialog: DialogService) {}
 
   open() {
-    this.dialog.open(DialogExComponent);
+    const ref = this.dialog.open(DialogExComponent, {
+      data: {
+        message: 'Some new content',
+      },
+    });
+
+    ref.afterClosed.subscribe((result) => {
+      console.log('Dialog closed', result);
+    });
   }
 }
